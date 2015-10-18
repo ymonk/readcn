@@ -2,7 +2,7 @@
  * Created by myan on 21/09/15.
  */
 
-var apiHost = "http://10.0.0.61:5050";
+var apiHost = "http://writeuptube.com:5050";
 var apiKeyPostfix = "key=abc123";
 
 //var getURLParameter = function (sParam) {

@@ -10,7 +10,7 @@ _obj
 _test
 pkg
 .idea
-
+dbdump
 
 # Architecture specific extensions/prefixes
 *.[568vq]

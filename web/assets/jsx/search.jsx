@@ -4,7 +4,7 @@
 
 var apiKeyPostfix = "key=abc123";
 var editable = false;
-var apiHost = "http://10.0.0.61:5050";
+var apiHost = "http://writeuptube.com:5050";
 
 
 var getURLParameter = function (sParam) {
