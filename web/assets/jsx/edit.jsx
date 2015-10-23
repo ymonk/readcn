@@ -117,7 +117,7 @@ var EditPane = React.createClass({
   onSave: function (evt) {
     var url = postTargetURL();
     $.post(url, JSON.stringify(this.state.article)).done(function (d, s, r) {
-      var newURL =  "/static/edit.html?v=" + this.currentPermalink();
+      var newURL =  "/edit?v=" + this.currentPermalink();
       history.pushState({}, "", newURL);
       $("#show-message").trigger("click");
     }.bind(this));

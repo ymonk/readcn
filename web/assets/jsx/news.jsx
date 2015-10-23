@@ -117,10 +117,10 @@ var ArticleSummary = React.createClass({
   render: function () {
     var rawMarkup = this.props.data.preview;
     var genlink = function (permalink) {
-      return '/static/read.html?v=' + permalink;
+      return '/read?v=' + permalink;
     };
     var editlink = function (permalink) {
-      return '/static/edit.html?v=' + permalink;
+      return '/edit?v=' + permalink;
     };
     var insertEditLink = function () {
       if (editable) {

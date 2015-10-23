@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd ./api
+./api &
+
+cd ../web
+./web
+cd ../
+

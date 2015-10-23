@@ -151,8 +151,6 @@ var SearchView = React.createClass({
   render: function () {
     return (
       <div className="col-md-12">
-        <h1>Search Results</h1>
-
         <div className="content-page">
           <form className="content-search-view2" action="#">
             <div className="input-group">
@@ -196,7 +194,7 @@ var SearchResult = React.createClass({
   render: function () {
     var rawMarkup = this.props.data.preview;
     var genlink = function (permalink) {
-      return '/static/read.html?v=' + permalink + '&hl=' + searchTarget();
+      return '/read?v=' + permalink + '&hl=' + searchTarget();
     };
 
     return (
@@ -306,6 +304,14 @@ function searchByGrammar(grammar) {
   );
 }
 
+function searchGeneric() {
+  React.render(
+    <SearchView />,
+    document.getElementById('search-view')
+  );
+}
+
+
 $(function () {
   var targetChar = getURLParameter("c");
   var targetVocabulary = getURLParameter("w");
@@ -317,6 +323,8 @@ $(function () {
     searchByWord(targetVocabulary);
   } else if (typeof(targetGrammar) != "undefined") {
     searchByGrammar(targetGrammar);
+  } else {
+    searchGeneric();
   }
 });
 

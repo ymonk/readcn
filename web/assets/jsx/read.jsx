@@ -50,7 +50,7 @@ var ArticleView = React.createClass({
 
     render: function () {
         var genlink = function (permalink) {
-            return '/static/edit.html?v=' + permalink
+            return '/edit?v=' + permalink
         };
 
         if (typeof(this.state.data.body) == "undefined") {
