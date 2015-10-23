@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd ./rnapi && go build
+cd ../rnweb && go build
+cd ../
+
+

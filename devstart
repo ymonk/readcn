@@ -1,0 +1,5 @@
+#!/bin/sh
+
+./api/api &
+./web/web -port 5000
+
