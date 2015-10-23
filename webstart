@@ -1,5 +1,5 @@
 #!/bin/sh
 
-sudo ./api/api &
-sudo ./web/web -port 80 &
+sudo ./rnapi/rnapi &
+sudo ./rnweb/rnweb -port 80 &
 

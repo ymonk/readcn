@@ -1,5 +1,5 @@
 #!/bin/sh
 
-./api/api &
-./web/web -port 5000
+./rnapi/rnapi &
+./rnweb/rnweb -port 5000
 
