@@ -2,20 +2,6 @@
  * Created by myan on 21/09/15.
  */
 
-var apiHost = "http://writeuptube.com:5050";
-var apiKeyPostfix = "key=abc123";
-
-//var getURLParameter = function (sParam) {
-//  var sPageURL = window.location.search.substring(1);
-//  var sURLVariables = sPageURL.split('&');
-//  for (var i = 0; i < sURLVariables.length; i++) {
-//    var sParameterName = sURLVariables[i].split('=');
-//    if (sParameterName[0] == sParam) {
-//      return sParameterName[1];
-//    }
-//  }
-//};
-
 var actionTargetURL = function () {
   return apiHost + "/create/article" + "?" + apiKeyPostfix;
 };
@@ -112,8 +98,7 @@ var EditPane = React.createClass({
     var url = actionTargetURL();
     console.log("About to POST to", url);
     $.post(url, JSON.stringify(this.state.article)).done(function (d, s, r) {
-      console.log("Jump to", "/static/read.html?v=" + this.currentPermalink());
-      window.location = "/static/read.html?v=" + this.currentPermalink();
+      window.location = "/read?v=" + this.currentPermalink();
     }.bind(this));
     evt.preventDefault();
   },

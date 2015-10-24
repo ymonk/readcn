@@ -2,20 +2,6 @@
  * Created by myan on 21/09/15.
  */
 
-var apiHost = "http://writeuptube.com:5050";
-var apiKeyPostfix = "key=abc123";
-
-var getURLParameter = function (sParam) {
-  var sPageURL = window.location.search.substring(1);
-  var sURLVariables = sPageURL.split('&');
-  for (var i = 0; i < sURLVariables.length; i++) {
-    var sParameterName = sURLVariables[i].split('=');
-    if (sParameterName[0] == sParam) {
-      return sParameterName[1];
-    }
-  }
-};
-
 // Get permalink from URL like http://localhost:5000/article?v=55e9423f5485093cbdfe835f
 var permalinkFromURL = function () {
   return getURLParameter("v")
@@ -106,6 +92,16 @@ var EditPane = React.createClass({
     this.handleChange("categories", evt.target.value);
   },
 
+  onVisibilityChange: function (evt) {
+    var visibility = 2;
+    if (evt.target.checked == false) {
+      visibility = 1;
+    }
+    var article = this.state.article;
+    article.visibility = visibility;
+    this.setState({article: article});
+  },
+
   onBodyChange: function (evt) {
     this.handleChange("body", evt.target.value);
   },
@@ -127,12 +123,27 @@ var EditPane = React.createClass({
   onSaveClose: function (evt) {
     var url = postTargetURL();
     $.post(url, JSON.stringify(this.state.article)).done(function (d, s, r) {
-      history.back();
+      window.location = "/editing"
     }.bind(this));
     evt.preventDefault();
   },
 
+  onCreate: function (evt) {
+    window.location = "/create"
+    evt.preventDefault();
+  },
+
   onDelete: function (evt) {
+    var url = postTargetURL();
+    this.state.article.visibility = 0
+    $.post(url, JSON.stringify(this.state.article)).done(function (d, s, r) {
+      window.location = "/editing"
+    }.bind(this));
+    evt.preventDefault();
+  },
+
+
+  onDeleteObsolated: function (evt) {
     var url = apiHost + "/delete/article/" + permalinkFromURL() + "?" + apiKeyPostfix;
     $.ajax({
       url: url,
@@ -146,6 +157,7 @@ var EditPane = React.createClass({
         console.error(this.props.url, status, err.toString());
       }.bind(this)
     });
+    window.location = "/editing"
     evt.preventDefault();
   },
 
@@ -169,8 +181,9 @@ var EditPane = React.createClass({
             </div>
             <div className="btn-set pull-right">
               <button className="btn btn-default btn-circle" onClick={this.onReset}><i className="fa fa-reply"></i> Reset</button>
-              <button className="btn green-haze btn-circle" onClick={this.onSaveClose}><i className="fa fa-check-circle"></i> Save and Back</button>
-              <button className="btn green-haze btn-circle" onClick={this.onSave}><i className="fa fa-check-circle"></i> Save and Continue</button>
+              <button className="btn green-haze btn-circle" onClick={this.onCreate}><i className="fa fa-check-circle"></i> Create </button>
+              <button className="btn green-haze btn-circle" onClick={this.onSaveClose}><i className="fa fa-check-circle"></i> Save and Close</button>
+              <button className="btn green-haze btn-circle" onClick={this.onSave}><i className="fa fa-check-circle"></i> Save </button>
               <button className="btn red-haze btn-circle" onClick={this.onDelete}><i className="fa fa-times-circle"></i> Delete</button>
             </div>
           </div>
@@ -258,6 +271,18 @@ var EditPane = React.createClass({
                        placeholder="Categories, seperated with comma or semicomma" value={this.state.article.categories}/>
               </div>
             </div>
+
+            <div className="form-group">
+              <label className="col-md-2 control-label">Public: <span className="required">
+                                                                              * </span>
+              </label>
+
+              <div className="col-md-1">
+                <input type="checkbox" className="form-control" name="article[visibility]" onChange={this.onVisibilityChange}
+                       checked={this.state.article.visibility == 2} id="public-check" />
+              </div>
+            </div>
+
 
 
             <div className="form-group">

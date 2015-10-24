@@ -2,21 +2,8 @@
  * Created by myan on 21/09/15.
  */
 
-var apiKeyPostfix = "key=abc123";
+
 var editable = false;
-var apiHost = "http://writeuptube.com:5050";
-
-
-var getURLParameter = function (sParam) {
-  var sPageURL = window.location.search.substring(1);
-  var sURLVariables = sPageURL.split('&');
-  for (var i = 0; i < sURLVariables.length; i++) {
-    var sParameterName = sURLVariables[i].split('=');
-    if (sParameterName[0] == sParam) {
-      return sParameterName[1];
-    }
-  }
-};
 
 var searchTarget = function () {
   var char = getURLParameter("c");
@@ -109,10 +96,13 @@ var SearchView = React.createClass({
 
   searchTarget: function (evt) {
     var target = $("input#search-target").val();
+    var q = '?c=';
+    if (target.length > 1) {
+        q = '?w='
+    }
     var url = window.location.href;
-    var newURL = url.replace(/(\?[cwm])\=([^\&]+)/, "$1=" + target);
+    var newURL = url.replace(/(\?[cwm])\=([^\&]+)/, q + target);
     window.location.href = newURL;
-
     evt.preventDefault();
   },
 

@@ -2,20 +2,6 @@
  * Created by myan on 21/09/15.
  */
 
-var apiKeyPostfix = "key=abc123";
-var apiHost = "http://writeuptube.com:5050";
-
-var getURLParameter = function (sParam) {
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++) {
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam) {
-            return sParameterName[1];
-        }
-    }
-};
-
 var ArticleView = React.createClass({
     getInitialState: function () {
         return {data: {}};
@@ -63,7 +49,6 @@ var ArticleView = React.createClass({
             <div>
                 <div className="col-md-9 col-sm-9 blog-item">
                     <h4 className="active"><a href={genlink(this.state.data.permalink)}>{this.state.data.title}</a></h4>
-                    <h4 className="text-center">作者： {this.state.data.author}</h4>
                 <pre>
                     <div className="text-body" dangerouslySetInnerHTML={{__html: rawMarkup}}/>
                 </pre>

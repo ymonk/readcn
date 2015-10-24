@@ -1,5 +1,5 @@
 #!/bin/sh
 
-sudo ./rnapi/rnapi &
-sudo ./rnweb/rnweb -port 80 &
+sudo READCN_ENV=production ./rnapi/rnapi &
+sudo READCN_ENV=production ./rnweb/rnweb -port 80 &
 

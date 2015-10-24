@@ -7,9 +7,11 @@ import (
 
 // AppConfig defines
 var AppConfig struct {
-    Host                       string
-    Port                       string
-    CookieSalt                 string
+    Env                     string
+    ApiHostAddr             string
+    WebHost                 string
+    Port                    string
+    CookieSalt              string
 }
 
 
@@ -25,7 +27,21 @@ func getEnvOr(env, or string) string {
 func init() {
 	portPtr := flag.String("port", "5000", "port number")
 	flag.Parse()
-	AppConfig.Host = getEnvOr("READCN_HOST", "0.0.0.0")
-	AppConfig.Port = ":" + *portPtr
 	AppConfig.CookieSalt = "fff3a4f5-cd75-46ef-8762-564793d6a3d4"
+
+    env := os.Getenv("READCN_ENV")
+    switch env {
+    case "development":
+        AppConfig.Env = "development"
+        AppConfig.ApiHostAddr = "http://localhost:5050"
+        AppConfig.WebHost = "http://localhost"
+        AppConfig.Port = ":" + *portPtr
+        AppConfig.CookieSalt = "fff3a4f5-cd75-46ef-8762-564793d6a3d4"
+    case "production":
+        AppConfig.Env = "production"
+        AppConfig.ApiHostAddr = "http://writeuptube.com:5050"
+        AppConfig.WebHost = "http://writeuptube.com"
+        AppConfig.Port = ":80"
+        AppConfig.CookieSalt = "9Df3a4f5-cd75-46ef-8762-564793d6a3d4"
+    }
 }

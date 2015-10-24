@@ -75,13 +75,10 @@ func (t *dynamicTemplateHandler) String() (string, error) {
 }
 
 func (t *dynamicTemplateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-    tpl := template.Must(template.New(t.filename).
-    Funcs(t.funcs).
-    ParseFiles(filepath.Join(templateDir, t.filename)))
+    tpl := template.Must(template.New(t.filename).Funcs(t.funcs).ParseFiles(filepath.Join(templateDir, t.filename)))
     if err := tpl.ExecuteTemplate(w, t.filename, t.data); err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
     }
-    t.ClearData()
 }
 
 // Data get template data

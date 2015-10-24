@@ -12,19 +12,23 @@ var tracer trace.Tracer = trace.Log
 
 func main() {
 
-	dev := true
+	dev := (AppConfig.Env == "development")
 
-	indexTemplateHandler := NewTemplateHandler("index.html", nil, dev)
-	newsTemplateHandler := NewTemplateHandler("news.html", nil, dev)
-	editTemplateHandler := NewTemplateHandler("edit.html", nil, dev)
-	editingTemplateHandler := NewTemplateHandler("editing.html", nil, dev)
-	createTemplateHandler := NewTemplateHandler("create.html", nil, dev)
-	readTemplateHandler := NewTemplateHandler("read.html", nil, dev)
-	searchTemplateHandler := NewTemplateHandler("search.html", nil, dev)
-	charTemplateHandler := NewTemplateHandler("hsk-characters.html", nil, dev)
-	mucharTemplateHandler :=  NewTemplateHandler("most-used-characters.html", nil, dev)
-	vocabularyTemplateHandler := NewTemplateHandler("hsk-vocabulary.html", nil, dev)
-	grammarTemplateHandler := NewTemplateHandler("hsk-grammar.html", nil, dev)
+	data := map[string]interface{} {
+		"ApiHostAddr": AppConfig.ApiHostAddr,
+	}
+
+	indexTemplateHandler := NewTemplateHandler("index.html", data, dev)
+	newsTemplateHandler := NewTemplateHandler("news.html", data, dev)
+	editTemplateHandler := NewTemplateHandler("edit.html", data, dev)
+	editingTemplateHandler := NewTemplateHandler("editing.html", data, dev)
+	createTemplateHandler := NewTemplateHandler("create.html", data, dev)
+	readTemplateHandler := NewTemplateHandler("read.html", data, dev)
+	searchTemplateHandler := NewTemplateHandler("search.html", data, dev)
+	charTemplateHandler := NewTemplateHandler("hsk-characters.html", data, dev)
+	mucharTemplateHandler :=  NewTemplateHandler("most-used-characters.html", data, dev)
+	vocabularyTemplateHandler := NewTemplateHandler("hsk-vocabulary.html", data, dev)
+	grammarTemplateHandler := NewTemplateHandler("hsk-grammar.html", data, dev)
 
 
 	// Use httprouter as the base of the router component
@@ -36,10 +40,6 @@ func main() {
 	// Serve static resources
 	router.Handler("GET", "/assets/*filepath",
 		commonWrapper.Then(http.StripPrefix("/assets/", http.FileServer(http.Dir("./assets")))))
-
-	// Serve static HTML
-//	router.Handler("GET", "/static/*filepath",
-//		commonWrapper.Then(http.StripPrefix("/static/", http.FileServer(http.Dir("./static")))))
 
 	router.Handler("GET", "/", commonWrapper.Then(indexTemplateHandler))
 	router.Handler("GET", "/reading", commonWrapper.Then(newsTemplateHandler))
@@ -62,14 +62,8 @@ func main() {
 	router.Handler("GET", "/hskvocabulary", commonWrapper.Then(vocabularyTemplateHandler))
 	router.Handler("GET", "/hskgrammar", commonWrapper.Then(grammarTemplateHandler))
 
-//	router.GET("/edit/:permalink", commonWrapper.ThenHttpRouterFunc(func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-//		permalink := ps.ByName("permalink")
-//		http.Redirect(w, r, "/static/edit.html?v=" + permalink, http.StatusMovedPermanently)
-//	}))
-
-
-	tracer.Trace("Starting web server on ", AppConfig.Host, AppConfig.Port)
-	log.Fatal(http.ListenAndServe(AppConfig.Host + AppConfig.Port, router))
+	tracer.Trace("Starting web server on ", AppConfig.WebHost, AppConfig.Port)
+	log.Fatal(http.ListenAndServe(AppConfig.Port, router))
 }
 
 // NewRouter create a new httprouter, change the NotFound handler to dull

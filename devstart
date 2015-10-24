@@ -1,5 +1,5 @@
 #!/bin/sh
 
-./rnapi/rnapi &
-./rnweb/rnweb -port 5000
+READCN_ENV=development ./rnapi/rnapi &
+READCN_ENV=development ./rnweb/rnweb -port 5000
 

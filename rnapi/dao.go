@@ -5,7 +5,8 @@ import (
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
     "time"
-"strings"
+    "strings"
+    "regexp"
 )
 
 func daoMaxSno(articles *mgo.Collection) int {
@@ -44,11 +45,11 @@ func daoGetArticle(db *mgo.Database, permalink string) (bson.M, error) {
     jas := bson.M{}
     start := time.Now()
     query := as.Find(bson.M{"permalink": permalink}).
-                Select(bson.M{"title": 1, "author": 1,
+                Select(bson.M{"title": 1, "author": 1, "categories": 1,
                               "body": 1, "permalink": 1, "preview": 1,
                               "source": 1, "publishedAt": 1, "char_level": 1,
                               "vocabulary_level": 1, "grammar_level": 1,
-                              "num_comment": 1, "tags": 1})
+                              "num_comment": 1, "tags": 1, "visibility": 1})
     end := time.Now()
     tracer.Tracef("DB query: %v\n", end.Sub(start))
     start = end
@@ -96,26 +97,12 @@ func daoNewArticle(db *mgo.Database, in []byte) error {
 }
 
 func parseTags(s string) []string {
-    strip := func (ss []string) {
+    return func (ss []string) []string {
         for i := 0; i < len(ss); i++ {
             ss[i] = strings.TrimSpace(ss[i])
         }
-    }
-
-    // try , first
-    tags := strings.Split(s, ",")
-    if len(tags) <= 1 {
-        tags = strings.Split(s, ";")
-    }
-    if len(tags) <= 1 {
-        tags = strings.Split(s, "，")
-    }
-    if len(tags) <= 1 {
-        tags = strings.Split(s, "；")
-    }
-
-    strip(tags)
-    return tags
+        return ss
+    }(regexp.MustCompile("[,;，；]+").Split(s, -1))
 }
 
 func daoNewId(db *mgo.Database) bson.M {
