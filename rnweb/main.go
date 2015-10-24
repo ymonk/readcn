@@ -4,6 +4,7 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/ymonk/readcn/pkg/alice"
 	"github.com/ymonk/readcn/pkg/trace"
+	"github.com/ymonk/party"
 	"log"
 	"net/http"
 )
@@ -18,17 +19,17 @@ func main() {
 		"ApiHostAddr": AppConfig.ApiHostAddr,
 	}
 
-	indexTemplateHandler := NewTemplateHandler("index.html", data, dev)
-	newsTemplateHandler := NewTemplateHandler("news.html", data, dev)
-	editTemplateHandler := NewTemplateHandler("edit.html", data, dev)
-	editingTemplateHandler := NewTemplateHandler("editing.html", data, dev)
-	createTemplateHandler := NewTemplateHandler("create.html", data, dev)
-	readTemplateHandler := NewTemplateHandler("read.html", data, dev)
-	searchTemplateHandler := NewTemplateHandler("search.html", data, dev)
-	charTemplateHandler := NewTemplateHandler("hsk-characters.html", data, dev)
-	mucharTemplateHandler :=  NewTemplateHandler("most-used-characters.html", data, dev)
-	vocabularyTemplateHandler := NewTemplateHandler("hsk-vocabulary.html", data, dev)
-	grammarTemplateHandler := NewTemplateHandler("hsk-grammar.html", data, dev)
+	indexTemplateHandler := party.New("index.html", data, dev)
+	newsTemplateHandler := party.New("news.html", data, dev)
+	editTemplateHandler := party.New("edit.html", data, dev)
+	editingTemplateHandler := party.New("editing.html", data, dev)
+	createTemplateHandler := party.New("create.html", data, dev)
+	readTemplateHandler := party.New("read.html", data, dev)
+	searchTemplateHandler := party.New("search.html", data, dev)
+	charTemplateHandler := party.New("hsk-characters.html", data, dev)
+	mucharTemplateHandler :=  party.New("most-used-characters.html", data, dev)
+	vocabularyTemplateHandler := party.New("hsk-vocabulary.html", data, dev)
+	grammarTemplateHandler := party.New("hsk-grammar.html", data, dev)
 
 
 	// Use httprouter as the base of the router component
