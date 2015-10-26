@@ -167,7 +167,7 @@ var EditPane = React.createClass({
     };
 
     var previewStyle = {
-      height: "140px"
+      height: "80px"
     };
 
     var rawMarkup = this.state.article.body;
@@ -191,16 +191,14 @@ var EditPane = React.createClass({
             <div className="form-group">
               <label className="col-md-2 control-label">Title: <span className="required"> * </span></label>
 
-              <div className="col-md-10">
+              <div className="col-md-4">
                 <input type="text" className="form-control" name="article[title]" onChange={this.onTitleChange}
                        placeholder="title" value={this.state.article.title} />
               </div>
-            </div>
 
-            <div className="form-group">
               <label className="col-md-2 control-label">Author: <span className="required"> * </span></label>
 
-              <div className="col-md-10">
+              <div className="col-md-4">
                 <input type="text" className="form-control" name="article[author]" onChange={this.onAuthorChange}
                        placeholder="author" value={this.state.article.author} />
               </div>
@@ -219,32 +217,38 @@ var EditPane = React.createClass({
             </div>
 
             <div className="form-group">
-              <label className="col-md-2 control-label">HSK Character Level: <span className="required">
-                                                                              * </span>
+              <label className="col-md-2 control-label">
+                Text: <span className="required">* </span>
               </label>
 
               <div className="col-md-10">
-                <input type="text" className="form-control" name="article[char_level]" onChange={this.onCharLevelChange}
-                       placeholder="" value={this.state.article.char_level} />
+              <textarea className="form-control" style={bodyStyle} name="article[body]"
+                        onChange={this.onBodyChange}  value={rawMarkup} />
               </div>
             </div>
 
             <div className="form-group">
+              <label className="col-md-2 control-label">
+                HSK Character Level: <span className="required"> * </span>
+              </label>
+
+              <div className="col-md-2">
+                <input type="text" className="form-control" name="article[char_level]" onChange={this.onCharLevelChange}
+                       placeholder="" value={this.state.article.char_level} />
+              </div>
               <label className="col-md-2 control-label">HSK Vocabulary Level: <span className="required">
                   * </span>
               </label>
 
-              <div className="col-md-10">
+              <div className="col-md-2">
                 <input type="text" className="form-control" name="article[vocabulary_level]" onChange={this.onVocabularyLevelChange}
                        placeholder="" value={this.state.article.vocabulary_level} />
               </div>
-            </div>
-            <div className="form-group">
               <label className="col-md-2 control-label">HSK Grammar Level: <span className="required">
                                                                               * </span>
               </label>
 
-              <div className="col-md-10">
+              <div className="col-md-2">
                 <input type="text" className="form-control" name="article[grammar_level]" onChange={this.onGrammarLevelChange}
                        placeholder="" value={this.state.article.grammar_level} />
               </div>
@@ -255,18 +259,15 @@ var EditPane = React.createClass({
                                                                               * </span>
               </label>
 
-              <div className="col-md-10">
+              <div className="col-md-4">
                 <input type="text" className="form-control" name="article[source]" onChange={this.onSourceChange}
                        placeholder="" value={this.state.article.source}/>
               </div>
-            </div>
-
-            <div className="form-group">
               <label className="col-md-2 control-label">Categories: <span className="required">
                                                                               * </span>
               </label>
 
-              <div className="col-md-10">
+              <div className="col-md-4">
                 <input type="text" className="form-control" name="article[categories]" onChange={this.onCategoriesChange}
                        placeholder="Categories, seperated with comma or semicomma" value={this.state.article.categories}/>
               </div>
@@ -281,27 +282,10 @@ var EditPane = React.createClass({
                 <input type="checkbox" className="form-control" name="article[visibility]" onChange={this.onVisibilityChange}
                        checked={this.state.article.visibility == 2} id="public-check" />
               </div>
-            </div>
-
-
-
-            <div className="form-group">
-              <label className="col-md-2 control-label">Text: <span className="required">
-                                                                              * </span>
-              </label>
-
-              <div className="col-md-10">
-                <textarea className="form-control" style={bodyStyle} name="article[body]" onChange={this.onBodyChange}
-                          value={rawMarkup} />
-              </div>
-            </div>
-
-
-            <div className="form-group">
               <label className="col-md-2 control-label">Permanent Link: <span className="required"> * </span>
               </label>
 
-              <div className="col-md-10">
+              <div className="col-md-7">
                 <input type="text" className="form-control" name="article[permalink]" onChange={this.onPermalinkChange}
                        placeholder="" value={this.state.article.permalink} />
               </div>
