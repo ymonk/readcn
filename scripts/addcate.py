@@ -60,9 +60,11 @@ def main():
     global count
     for doc in articles.find({}):
         try:
+            del(doc['categories'])
             author = doc['author']
             author = author.split(';')[0].strip()
             if author in xiaoshuo_authors:
+                print 'Got ' + author
                 doc['categories'] = [u'文学', u'文学>小说']
             elif author in zhuanji_authors:
                 doc['categories'] = [u'文学', u'文学>传记']
