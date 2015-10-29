@@ -19,7 +19,6 @@ func searchArticlesByCategory(w http.ResponseWriter, r *http.Request, ps httprou
 	if err != nil {
 		num = 10
 	}
-	tracer.Trace("Got page=", page, ", and num=", num)
 	jas, err := daoSearchArticlesByCategory(GetDB(r), cate, page*num, num)
 	if err != nil {
 		respondErr(w, r, http.StatusInternalServerError, "Database error: failed to get latest articles")
