@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/julienschmidt/httprouter"
+	"github.com/ymonk/party"
 	"github.com/ymonk/readcn/pkg/alice"
 	"github.com/ymonk/readcn/pkg/trace"
-	"github.com/ymonk/party"
 	"log"
 	"net/http"
 )
@@ -15,7 +15,7 @@ func main() {
 
 	dev := (AppConfig.Env == "development")
 
-	data := map[string]interface{} {
+	data := map[string]interface{}{
 		"ApiHostAddr": AppConfig.ApiHostAddr,
 	}
 
@@ -27,10 +27,10 @@ func main() {
 	readTemplateHandler := party.New("read.html", data, dev)
 	searchTemplateHandler := party.New("search.html", data, dev)
 	charTemplateHandler := party.New("hsk-characters.html", data, dev)
-	mucharTemplateHandler :=  party.New("most-used-characters.html", data, dev)
+	mucharTemplateHandler := party.New("most-used-characters.html", data, dev)
 	vocabularyTemplateHandler := party.New("hsk-vocabulary.html", data, dev)
 	grammarTemplateHandler := party.New("hsk-grammar.html", data, dev)
-
+	categoryTemplateHandler := party.New("category.html", data, dev)
 
 	// Use httprouter as the base of the router component
 	router := NewRouter()
@@ -49,19 +49,20 @@ func main() {
 	router.Handler("GET", "/edit", commonWrapper.Then(editTemplateHandler))
 	router.Handler("GET", "/create", commonWrapper.Then(createTemplateHandler))
 	router.Handler("GET", "/search", commonWrapper.Then(searchTemplateHandler))
-	router.Handler("POST", "/search", commonWrapper.ThenFunc(func (w http.ResponseWriter, r *http.Request) {
+	router.Handler("POST", "/search", commonWrapper.ThenFunc(func(w http.ResponseWriter, r *http.Request) {
 		target := r.FormValue("target")
 		q := "c"
 		if len(target) > 1 {
 			q = "w"
 		}
-		tracer.Trace("Redirecting to", "/search?" + q + "=" + target)
-		http.Redirect(w, r, "/search?" + q + "=" + target, http.StatusFound)
+		tracer.Trace("Redirecting to", "/search?"+q+"="+target)
+		http.Redirect(w, r, "/search?"+q+"="+target, http.StatusFound)
 	}))
 	router.Handler("GET", "/hskchar", commonWrapper.Then(charTemplateHandler))
 	router.Handler("GET", "/muchar", commonWrapper.Then(mucharTemplateHandler))
 	router.Handler("GET", "/hskvocabulary", commonWrapper.Then(vocabularyTemplateHandler))
 	router.Handler("GET", "/hskgrammar", commonWrapper.Then(grammarTemplateHandler))
+	router.Handler("GET", "/category", commonWrapper.Then(categoryTemplateHandler))
 
 	tracer.Trace("Starting web server on ", AppConfig.WebHost, AppConfig.Port)
 	log.Fatal(http.ListenAndServe(AppConfig.Port, router))
