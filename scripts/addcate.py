@@ -32,12 +32,9 @@ sourcecat = {
     u'老舍散文集': [u'文学', u'文学>散文'],
     u'教材 格言': [u'文学', u'文学>其他', u'文学>其他>格言'],
     u'教材 邮件要点': [u'应用文', u'应用文>日常文书', u'应用文>日常文书>邮件'],
-    u'人教版小学语文*': [u'课文', u'课文>第一语言用', u'课文>第一语言用>小学语文'],
-    u'上3-*': [u'课文', u'课文>第二语言用', u'课文>第二语言用>商务汉语'],
     u'中国古代寓言': [u'故事', u'故事>寓言'],
     u'伊索寓言': [u'故事', u'故事>寓言'],
     u'巧舌胜似强兵 口才故事250例': [u'故事', u'故事>智慧'],
-    u'幽默故事*': [u'故事', u'故事>幽默'],
     u'语文故事': [u'故事', u'故事>智慧'],
     u'趣味历史故事': [u'故事', u'故事>智慧'],
     u'鲁迅文集': [u'文学', u'文学>小说'],
@@ -46,11 +43,11 @@ sourcecat = {
     u'广告语': [u'应用文', u'应用文>行业文书', u'应用文>行业文书>广告文案'],
     u'幼儿童谣': [u'文学', u'文学>诗歌', u'文学>诗歌>童谣'],
     u'多音字一篇通': [u'课文', u'课文>其他'],
-    u'传记 摩托罗拉创业者': [u'文学', u'文学>传记'],
-    u'传记 福特': [u'文学', u'文学>传记'],
-    u'传记 美国酒王': [u'文学', u'文学>传记'],
-    u'传记 老洛克菲勒': [u'文学', u'文学>传记'],
-    u'传记 苦心经营': [u'文学', u'文学>传记'],
+    u'传记 摩托罗拉创业者': [u'文学', u'文学>纪实文学', u'文学>纪实文学>传记'],
+    u'传记 福特': [u'文学', u'文学>纪实文学', u'文学>纪实文学>传记'],
+    u'传记 美国酒王': [u'文学', u'文学>纪实文学', u'文学>纪实文学>传记'],
+    u'传记 老洛克菲勒': [u'文学', u'文学>纪实文学', u'文学>纪实文学>传记'],
+    u'传记 苦心经营': [u'文学', u'文学>纪实文学', u'文学>纪实文学>传记'],
     u'人教网': [u'故事', u'故事>成语故事']
 }
 
@@ -72,21 +69,31 @@ def main():
                 doc['categories'] = [u'文学', u'社会>心理']
             elif author in zhexue_authors:
                 doc['categories'] = [u'文学', u'社会>哲学']
-            articles.replace_one({'_id': doc[u'_id']}, doc):q
+            articles.replace_one({'_id': doc[u'_id']}, doc)
             count += 1
             print "Categorized:", doc[u'title'], ' - ', doc['categories'], ' : ', count
         except:
             try:
                 source = doc['source']
+                title = doc['title']
                 if source in sourcecat:
                     #print source, u':', doc[u'title']
                     doc['categories'] = sourcecat[source]
+                if source.startswith(u'人教版小学语文'):
+                    doc['categories'] = [u'课文', u'课文>第一语言用', u'课文>第一语言用>小学语文']
                 if source.startswith(u'上3-'):
                     #print source, u':', doc[u'title']
                     doc['categories'] = [u'课文', u'课文>第二语言用', u'课文>第二语言用>商务汉语']
                 if source.startswith(u'幽默故事'):
                     #print source, u':', doc[u'title']
                     doc['categories'] = [u'故事', u'故事>幽默']
+
+                if title.startswith(u'编辑部'):
+                    doc['categories'] = [u'文学', u'文学>剧本']
+                elif title.startswith(u'朱与中国'):
+                    doc['categories'] = [u'文学', u'文学>其他', u'文学>其他>评论']
+
+
                 articles.replace_one({'_id': doc[u'_id']}, doc)
                 count += 1
                 print "Categorized:", doc[u'title'], ' - ', doc['categories'], ' : ', count
