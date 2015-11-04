@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"regexp"
 	"strings"
+    "sort"
 	"time"
 )
 
@@ -74,7 +75,7 @@ func daoUpdateArticle(db *mgo.Database, permalink string, in []byte) error {
 
 	categories, _ := am["categories"].(string)
 	if len(categories) > 0 {
-		am["categories"] = parseTags(categories)
+		am["categories"] = parseCategories(categories)
 	}
 	err := as.Update(bson.M{"permalink": permalink}, bson.M{"$set": am})
 	return err
@@ -89,20 +90,57 @@ func daoNewArticle(db *mgo.Database, in []byte) error {
 	am["sno"] = daoMaxSno(as) + 1
 	categories, _ := am["categories"].(string)
 	if len(categories) > 0 {
-		am["categories"] = parseTags(categories)
+		am["categories"] = parseCategories(categories)
 	}
 	tracer.Trace("permalink=", am["permalink"])
 	err := as.Insert(am)
 	return err
 }
 
+func parseCategories(s string) []string {
+    cats := parseTags(s)
+    result := make([]string, 0, len(cats) * 2)
+    for _, v := range cats {
+        result = append(result, allCategories(v)...)
+    }
+    sort.Strings(result)
+    result = rmdup(result)
+    return result
+}
+
+func rmdup(ss []string) []string {
+    result := make([]string, 0, len(ss))
+    cv := ss[0]
+    result = append(result, cv)
+    for _, v := range(ss) {
+        if v != cv {
+            cv = v
+            result = append(result, v)
+        }
+    }
+    return result
+}
+
+func allCategories(s string) []string {
+    result := make([]string, 0, 3)
+    if strings.Contains(s, ">") {
+        result = append(result, allCategories(stripLastCategory(s))...)
+    }
+    return append(result, s)
+}
+
+func stripLastCategory(s string) string {
+    i := strings.LastIndex(s, ">")
+    return s[:i]
+}
+
 func parseTags(s string) []string {
-	return func(ss []string) []string {
-		for i := 0; i < len(ss); i++ {
-			ss[i] = strings.TrimSpace(ss[i])
-		}
-		return ss
-	}(regexp.MustCompile("[,;，；]+").Split(s, -1))
+    return func(ss []string) []string {
+        for i := 0; i < len(ss); i++ {
+            ss[i] = strings.TrimSpace(ss[i])
+        }
+        return ss
+    }(regexp.MustCompile("[,;，；]+").Split(s, -1))
 }
 
 func daoNewId(db *mgo.Database) bson.M {
@@ -123,7 +161,8 @@ func daoDeleteArticle(db *mgo.Database, permalink string) error {
 func daoSearchArticlesByChar(db *mgo.Database, ch string, grade int, start, num int) ([]bson.M, error) {
 	as := db.C("articles")
 	jas := make([]bson.M, num)
-	err := as.Find(bson.M{"charlist": ch, "char_level": grade}).
+	query := bson.M{"charlist": ch, "char_level": grade, "visibility": bson.M{"$gte": 1}}
+	err := as.Find(query).
 		Select(bson.M{"title": 1, "preview": 1, "permalink": 1,
 		"source": 1, "publishedAt": 1, "char_level": 1,
 		"vocabulary_level": 1, "grammar_level": 1,
@@ -138,7 +177,8 @@ func daoSearchArticlesByChar(db *mgo.Database, ch string, grade int, start, num 
 func daoSearchArticlesByVocabulary(db *mgo.Database, word string, grade int, start, num int) ([]bson.M, error) {
 	as := db.C("articles")
 	jas := make([]bson.M, num)
-	err := as.Find(bson.M{"wseg": word, "vocabulary_level": grade}).
+	query := bson.M{"wseg": word, "vocabulary_level": grade, "visibility": bson.M{"$gte": 1}}
+	err := as.Find(query).
 		Select(bson.M{"title": 1, "preview": 1, "permalink": 1,
 		"source": 1, "publishedAt": 1, "char_level": 1,
 		"vocabulary_level": 1, "grammar_level": 1,
@@ -153,7 +193,8 @@ func daoSearchArticlesByVocabulary(db *mgo.Database, word string, grade int, sta
 func daoSearchArticlesByCategory(db *mgo.Database, category string, start, num int) ([]bson.M, error) {
 	as := db.C("articles")
 	jas := make([]bson.M, num)
-	err := as.Find(bson.M{"categories": category}).
+	query := bson.M{"categories": category, "visibility": bson.M{"$gte": 1}}
+	err := as.Find(query).
 		Select(bson.M{"title": 1, "preview": 1, "permalink": 1,
 		"source": 1, "publishedAt": 1, "char_level": 1,
 		"vocabulary_level": 1, "grammar_level": 1,

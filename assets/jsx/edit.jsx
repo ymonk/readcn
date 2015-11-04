@@ -137,7 +137,7 @@ var EditPane = React.createClass({
     var url = postTargetURL();
     this.state.article.visibility = 0
     $.post(url, JSON.stringify(this.state.article)).done(function (d, s, r) {
-      window.location = "/editing"
+      window.history.back();
     }.bind(this));
     evt.preventDefault();
   },

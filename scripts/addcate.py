@@ -72,7 +72,7 @@ def main():
                 doc['categories'] = [u'文学', u'社会>心理']
             elif author in zhexue_authors:
                 doc['categories'] = [u'文学', u'社会>哲学']
-            articles.replace_one({'_id': doc[u'_id']}, doc)
+            articles.replace_one({'_id': doc[u'_id']}, doc):q
             count += 1
             print "Categorized:", doc[u'title'], ' - ', doc['categories'], ' : ', count
         except:
