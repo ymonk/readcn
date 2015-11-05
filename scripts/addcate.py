@@ -11,7 +11,7 @@ xiaoshuo_authors = {u'余华', u'刘心武', u'方芳', u'毕淑敏', u'池莉',
            u'浩然', u'刘连群', u'刘震云', u'田小菲', u'张郎郎', u'阿城', u'尤凤伟', u'乔典运',
            u'廉声', u'礼平', u'何玉茹', u'张洁', u'冯向光', u'简平', u'赵琪', u'陆文夫', u'汪曾祺'}
 
-zhuanji_authors = {u'冯骥才'}
+jishi_authors = {u'冯骥才'}
 xinli_authors = {u'方富熹', u'方格'}
 zhexue_authors = {u'冯友兰', u'涂又光'}
 
@@ -63,12 +63,12 @@ def main():
             if author in xiaoshuo_authors:
                 print 'Got ' + author
                 doc['categories'] = [u'文学', u'文学>小说']
-            elif author in zhuanji_authors:
-                doc['categories'] = [u'文学', u'文学>传记']
+            elif author in jishi_authors:
+                doc['categories'] = [u'文学', u'文学>纪实文学', u'文学>纪实文学>传记', u'文学>纪实文学>报告文学', ]
             elif author in xinli_authors:
-                doc['categories'] = [u'文学', u'社会>心理']
+                doc['categories'] = [u'百科', u'百科>社会',u'百科>社会>心理']
             elif author in zhexue_authors:
-                doc['categories'] = [u'文学', u'社会>哲学']
+                doc['categories'] = [u'百科', u'百科>社会',u'百科>社会>哲学']
             articles.replace_one({'_id': doc[u'_id']}, doc)
             count += 1
             print "Categorized:", doc[u'title'], ' - ', doc['categories'], ' : ', count
