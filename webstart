@@ -1,5 +1,7 @@
 #!/bin/sh
-
+sudo nsqlookupd &
+sudo nsqd --lookupd-tcp-address=localhost:4160 &
+sudo python2 ./scripts/segword.py &
 sudo READCN_ENV=production ./rnapi/rnapi &
 sudo READCN_ENV=production ./rnweb/rnweb -port 80 &
 

@@ -97,11 +97,15 @@ var SearchView = React.createClass({
   searchTarget: function (evt) {
     var target = $("input#search-target").val();
     var q = '?c=';
-    if (target.length > 1) {
-        q = '?w='
+    if (target.length > 1) {        
+        if (target.split('/').length >= 2) {          
+          q = '?m=';
+        } else {
+          q = '?w='; 
+        }        
     }
     var url = window.location.href;
-    var newURL = url.replace(/(\?[cwm])\=([^\&]+)/, q + target);
+    var newURL = url.replace(/(\?[cwm])\=([^\&]+)/, q + encodeURIComponent(target));
     window.location.href = newURL;
     evt.preventDefault();
   },
@@ -184,7 +188,14 @@ var SearchResult = React.createClass({
   render: function () {
     var rawMarkup = this.props.data.preview;
     var genlink = function (permalink) {
-      return '/read?v=' + permalink + '&hl=' + searchTarget();
+      var target = searchTarget().split('%2F')[0];      
+      if (target.startsWith('.')) {
+        target = target.substring(4);
+      } else if (target.endsWith('.%2B')) {
+        target = target.substring(0, target.length - 4);
+      }
+
+      return '/read?v=' + permalink + '&hl=' + target;
     };
 
     return (
@@ -305,7 +316,7 @@ function searchGeneric() {
 $(function () {
   var targetChar = getURLParameter("c");
   var targetVocabulary = getURLParameter("w");
-  var targetGrammar = getURLParameter("g");
+  var targetGrammar = getURLParameter("m");
 
   if (typeof(targetChar) != "undefined") {
     searchByChar(targetChar);

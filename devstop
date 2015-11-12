@@ -1,5 +1,7 @@
 #!/bin/sh
-
+killall nsqlookupd
+killall nsqd
+killall python2
 killall rnapi
 killall rnweb
 

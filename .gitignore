@@ -28,4 +28,4 @@ readcn.iml
 *.exe
 *.test
 *.prof
-
+*.dat

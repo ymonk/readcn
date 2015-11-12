@@ -5,8 +5,9 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"regexp"
+	"sort"
+	"strconv"
 	"strings"
-    "sort"
 	"time"
 )
 
@@ -63,6 +64,33 @@ func daoGetArticle(db *mgo.Database, permalink string) (bson.M, error) {
 	return jas, nil
 }
 
+func processAm(am bson.M) {
+	categories, _ := am["categories"].(string)
+	if len(categories) > 0 {
+		am["categories"] = parseCategories(categories)
+	}
+
+	scl, svl, sgl := am["char_level"], am["vocabulary_level"], am["grammar_level"]
+	var err error
+	if cl, ok := scl.(string); ok {
+		if am["char_level"], err = strconv.Atoi(cl); err != nil {
+			am["char_level"] = 1
+		}
+	}
+
+	if vl, ok := svl.(string); ok {
+		if am["vocabulary_level"], err = strconv.Atoi(vl); err != nil {
+			am["vocabulary_level"] = 1
+		}
+	}
+
+	if gl, ok := sgl.(string); ok {
+		if am["grammar_level"], err = strconv.Atoi(gl); err != nil {
+			am["grammar_level"] = 1
+		}
+	}
+}
+
 func daoUpdateArticle(db *mgo.Database, permalink string, in []byte) error {
 	as := db.C("articles")
 	am := bson.M{}
@@ -73,11 +101,13 @@ func daoUpdateArticle(db *mgo.Database, permalink string, in []byte) error {
 		delete(am, "_id")
 	}
 
-	categories, _ := am["categories"].(string)
-	if len(categories) > 0 {
-		am["categories"] = parseCategories(categories)
-	}
+	processAm(am)
+
 	err := as.Update(bson.M{"permalink": permalink}, bson.M{"$set": am})
+	if err == nil {
+		nsqMessenger.Publish("readcn-segword", []byte(`{"permalink": "`+am["permalink"].(string)+`"}`))
+	}
+
 	return err
 }
 
@@ -88,59 +118,60 @@ func daoNewArticle(db *mgo.Database, in []byte) error {
 		return err
 	}
 	am["sno"] = daoMaxSno(as) + 1
-	categories, _ := am["categories"].(string)
-	if len(categories) > 0 {
-		am["categories"] = parseCategories(categories)
-	}
-	tracer.Trace("permalink=", am["permalink"])
+
+	processAm(am)
+
 	err := as.Insert(am)
+	if err == nil {
+		nsqMessenger.Publish("readcn-segword", []byte(`{"permalink": "`+am["permalink"].(string)+`"}`))
+	}
 	return err
 }
 
 func parseCategories(s string) []string {
-    cats := parseTags(s)
-    result := make([]string, 0, len(cats) * 2)
-    for _, v := range cats {
-        result = append(result, allCategories(v)...)
-    }
-    sort.Strings(result)
-    result = rmdup(result)
-    return result
+	cats := parseTags(s)
+	result := make([]string, 0, len(cats)*2)
+	for _, v := range cats {
+		result = append(result, allCategories(v)...)
+	}
+	sort.Strings(result)
+	result = rmdup(result)
+	return result
 }
 
 func rmdup(ss []string) []string {
-    result := make([]string, 0, len(ss))
-    cv := ss[0]
-    result = append(result, cv)
-    for _, v := range(ss) {
-        if v != cv {
-            cv = v
-            result = append(result, v)
-        }
-    }
-    return result
+	result := make([]string, 0, len(ss))
+	cv := ss[0]
+	result = append(result, cv)
+	for _, v := range ss {
+		if v != cv {
+			cv = v
+			result = append(result, v)
+		}
+	}
+	return result
 }
 
 func allCategories(s string) []string {
-    result := make([]string, 0, 3)
-    if strings.Contains(s, ">") {
-        result = append(result, allCategories(stripLastCategory(s))...)
-    }
-    return append(result, s)
+	result := make([]string, 0, 3)
+	if strings.Contains(s, ">") {
+		result = append(result, allCategories(stripLastCategory(s))...)
+	}
+	return append(result, s)
 }
 
 func stripLastCategory(s string) string {
-    i := strings.LastIndex(s, ">")
-    return s[:i]
+	i := strings.LastIndex(s, ">")
+	return s[:i]
 }
 
 func parseTags(s string) []string {
-    return func(ss []string) []string {
-        for i := 0; i < len(ss); i++ {
-            ss[i] = strings.TrimSpace(ss[i])
-        }
-        return ss
-    }(regexp.MustCompile("[,;，；]+").Split(s, -1))
+	return func(ss []string) []string {
+		for i := 0; i < len(ss); i++ {
+			ss[i] = strings.TrimSpace(ss[i])
+		}
+		return ss
+	}(regexp.MustCompile("[,;，；]+").Split(s, -1))
 }
 
 func daoNewId(db *mgo.Database) bson.M {
@@ -201,6 +232,29 @@ func daoSearchArticlesByCategory(db *mgo.Database, category string, start, num i
 		"num_comment": 1, "tags": 1}).
 		Sort("-sno").Skip(start).Limit(num).All(&jas)
 
+	if err != nil {
+		return nil, err
+	}
+	return jas, nil
+}
+
+func daoSearchArticlesByGrammar(db *mgo.Database, grammar string, grade int, start, num int) ([]bson.M, error) {
+	as := db.C("articles")
+	jas := make([]bson.M, num)
+	// query := bson.M{"pseg": grammar, "vocabulary_level": grade, "visibility": bson.M{"$gte": 1}}
+	query := bson.M{
+		"vocabulary_level": grade, 
+		"visibility": bson.M{"$gte": 1},
+		"pseg": bson.M{"$regex": grammar},
+	}
+
+
+	err := as.Find(query).
+		Select(bson.M{"title": 1, "preview": 1, "permalink": 1,
+		"source": 1, "publishedAt": 1, "char_level": 1,
+		"vocabulary_level": 1, "grammar_level": 1,
+		"num_comment": 1, "tags": 1}).
+		Sort("-sno").Skip(start).Limit(num).All(&jas)
 	if err != nil {
 		return nil, err
 	}

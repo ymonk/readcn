@@ -7,6 +7,8 @@ import (
 	"github.com/ymonk/readcn/pkg/trace"
 	"log"
 	"net/http"
+	"net/url"
+	"strings"
 )
 
 var tracer trace.Tracer = trace.Log
@@ -53,10 +55,14 @@ func main() {
 		target := r.FormValue("target")
 		q := "c"
 		if len(target) > 1 {
-			q = "w"
+			if len(strings.Split(target, "/")) >= 2 {
+				q = "m"
+			} else {
+				q = "w"	
+			}			
 		}
-		tracer.Trace("Redirecting to", "/search?"+q+"="+target)
-		http.Redirect(w, r, "/search?"+q+"="+target, http.StatusFound)
+		tracer.Trace("Redirecting to", "/search?"+q+"="+url.QueryEscape(target))
+		http.Redirect(w, r, "/search?"+q+"="+url.QueryEscape(target), http.StatusFound)
 	}))
 	router.Handler("GET", "/hskchar", commonWrapper.Then(charTemplateHandler))
 	router.Handler("GET", "/muchar", commonWrapper.Then(mucharTemplateHandler))

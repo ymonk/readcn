@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/bitly/go-nsq"
 	"github.com/julienschmidt/httprouter"
 	"github.com/ymonk/readcn/pkg/alice"
 	"github.com/ymonk/readcn/pkg/trace"
@@ -14,6 +15,7 @@ import (
 
 var tracer trace.Tracer
 var webcache *Cache
+var nsqMessenger *nsq.Producer
 
 func init() {
 	tracer = trace.Log
@@ -35,6 +37,10 @@ func main() {
 
 	defer dbConn.Close()
 
+	// Set up NSQ
+	nsqMessenger, _ = nsq.NewProducer("localhost:4150", nsq.NewConfig())
+	defer nsqMessenger.Stop()
+
 	router := newRouter()
 	commonWrapper := alice.New(withLogging, withRecover, withCORS, withAPIKey, withCache, withVars, withDatabase(dbConn))
 
@@ -48,7 +54,7 @@ func main() {
 
 	router.GET("/bychar", commonWrapper.ThenHttpRouterFunc(searchArticlesByChar))
 	router.GET("/byvocabulary", commonWrapper.ThenHttpRouterFunc(searchArticlesByVocabulary))
-	//router.GET("/bychar", commonWrapper.ThenHttpRouterFunc(searchArticlesByGrammar))
+	router.GET("/bygrammar", commonWrapper.ThenHttpRouterFunc(searchArticlesByGrammar))
 	tracer.Trace("Starting web server on ", *addr)
 	log.Fatal(http.ListenAndServe("0.0.0.0"+*addr, router))
 }
