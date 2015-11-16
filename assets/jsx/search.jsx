@@ -268,7 +268,7 @@ var PaginationTab = React.createClass({
 
     return (
       <div className="row">
-        <div className="col-md-4 col-sm-4 items-info">Items 1 to 9 of 10 total</div>
+        <div className="col-md-4 col-sm-4 items-info"></div>
         <div className="col-md-8 col-sm-8">
           <ul className="pagination pull-right">
             <li><a href="javascript:;" onClick={this.prevPages}>«</a></li>
