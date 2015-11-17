@@ -34,6 +34,7 @@ func main() {
 	vocabularyTemplateHandler := party.New("hsk-vocabulary.html", data, dev)
 	grammarTemplateHandler := party.New("hsk-grammar.html", data, dev)
 	categoryTemplateHandler := party.New("category.html", data, dev)
+	exprTemplateHandler := party.New("expressions.html", data, dev)
 	exprGreetingTemplateHandler := party.New("express-greetings.html", data, dev)
 	exprActionTemplateHandler := party.New("express-actions.html", data, dev)
 	exprOpinionTemplateHandler := party.New("express-opinions.html", data, dev)
@@ -77,6 +78,7 @@ func main() {
 	router.Handler("GET", "/hskgrammar", commonWrapper.Then(grammarTemplateHandler))
 	router.Handler("GET", "/category", commonWrapper.Then(categoryTemplateHandler))
 
+	router.Handler("GET", "/expression", commonWrapper.Then(exprTemplateHandler))
 	router.Handler("GET", "/expression/greeting", commonWrapper.Then(exprGreetingTemplateHandler))
 	router.Handler("GET", "/expression/action", commonWrapper.Then(exprActionTemplateHandler))
 	router.Handler("GET", "/expression/opinion", commonWrapper.Then(exprOpinionTemplateHandler))
