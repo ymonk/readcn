@@ -28,6 +28,7 @@ func main() {
 	createTemplateHandler := party.New("create.html", data, dev)
 	readTemplateHandler := party.New("read.html", data, dev)
 	searchTemplateHandler := party.New("search.html", data, dev)
+	hskTemplateHandler := party.New("hsk.html", data, dev)
 	charTemplateHandler := party.New("hsk-characters.html", data, dev)
 	mucharTemplateHandler := party.New("most-used-characters.html", data, dev)
 	vocabularyTemplateHandler := party.New("hsk-vocabulary.html", data, dev)
@@ -58,12 +59,13 @@ func main() {
 			if len(strings.Split(target, "/")) >= 2 {
 				q = "m"
 			} else {
-				q = "w"	
-			}			
+				q = "w"
+			}
 		}
 		tracer.Trace("Redirecting to", "/search?"+q+"="+url.QueryEscape(target))
 		http.Redirect(w, r, "/search?"+q+"="+url.QueryEscape(target), http.StatusFound)
 	}))
+	router.Handler("GET", "/hsk", commonWrapper.Then(hskTemplateHandler))
 	router.Handler("GET", "/hskchar", commonWrapper.Then(charTemplateHandler))
 	router.Handler("GET", "/muchar", commonWrapper.Then(mucharTemplateHandler))
 	router.Handler("GET", "/hskvocabulary", commonWrapper.Then(vocabularyTemplateHandler))
