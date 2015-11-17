@@ -34,6 +34,11 @@ func main() {
 	vocabularyTemplateHandler := party.New("hsk-vocabulary.html", data, dev)
 	grammarTemplateHandler := party.New("hsk-grammar.html", data, dev)
 	categoryTemplateHandler := party.New("category.html", data, dev)
+	exprGreetingTemplateHandler := party.New("express-greetings.html", data, dev)
+	exprActionTemplateHandler := party.New("express-actions.html", data, dev)
+	exprOpinionTemplateHandler := party.New("express-opinions.html", data, dev)
+	exprFeelingTemplateHandler := party.New("express-feelings.html", data, dev)
+	exprConversationTemplateHandler := party.New("express-conversations.html", data, dev)
 
 	// Use httprouter as the base of the router component
 	router := NewRouter()
@@ -71,6 +76,12 @@ func main() {
 	router.Handler("GET", "/hskvocabulary", commonWrapper.Then(vocabularyTemplateHandler))
 	router.Handler("GET", "/hskgrammar", commonWrapper.Then(grammarTemplateHandler))
 	router.Handler("GET", "/category", commonWrapper.Then(categoryTemplateHandler))
+
+	router.Handler("GET", "/expression/greeting", commonWrapper.Then(exprGreetingTemplateHandler))
+	router.Handler("GET", "/expression/action", commonWrapper.Then(exprActionTemplateHandler))
+	router.Handler("GET", "/expression/opinion", commonWrapper.Then(exprOpinionTemplateHandler))
+	router.Handler("GET", "/expression/feeling", commonWrapper.Then(exprFeelingTemplateHandler))
+	router.Handler("GET", "/expression/conversation", commonWrapper.Then(exprConversationTemplateHandler))
 
 	tracer.Trace("Starting web server on ", AppConfig.WebHost, AppConfig.Port)
 	log.Fatal(http.ListenAndServe(AppConfig.Port, router))
