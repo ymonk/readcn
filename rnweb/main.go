@@ -40,6 +40,7 @@ func main() {
 	exprOpinionTemplateHandler := party.New("express-opinions.html", data, dev)
 	exprFeelingTemplateHandler := party.New("express-feelings.html", data, dev)
 	exprConversationTemplateHandler := party.New("express-conversations.html", data, dev)
+	eresourceTemplateHandler := party.New("eresources.html", data, dev)
 
 	// Use httprouter as the base of the router component
 	router := NewRouter()
@@ -84,6 +85,8 @@ func main() {
 	router.Handler("GET", "/expression/opinion", commonWrapper.Then(exprOpinionTemplateHandler))
 	router.Handler("GET", "/expression/feeling", commonWrapper.Then(exprFeelingTemplateHandler))
 	router.Handler("GET", "/expression/conversation", commonWrapper.Then(exprConversationTemplateHandler))
+
+	router.Handler("GET", "/eresources", commonWrapper.Then(eresourceTemplateHandler))
 
 	tracer.Trace("Starting web server on ", AppConfig.WebHost, AppConfig.Port)
 	log.Fatal(http.ListenAndServe(AppConfig.Port, router))
